@@ -1,0 +1,8 @@
+// CrowdStrike query to look for mpclient.dll loaded by a process from unusual locations
+
+event_simpleName=ImageHash mpclient.dll
+| rename FilePath as DllFilePath
+| rename FileName as DllFileName
+| rename ContextProcessId_decimal as TargetProcessId_decimal | join TargetProcessId_decimal
+    [search event_simpleName=ProcessRollup2 NOT FilePath IN ("\\Device\\HarddiskVolume*\\ProgramData\\Microsoft\\Windows Defender\\Platform\\*" "\\Device\\HarddiskVolume*\\Program Files\\Windows Defender\\")]
+| table ComputerName FilePath FileName DllFilePath DllFileName
