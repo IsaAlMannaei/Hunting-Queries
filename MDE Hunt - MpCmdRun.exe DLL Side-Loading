@@ -1,0 +1,8 @@
+// Microsoft Defender for Endpoint query (KQL) to hunt for mpclient loaded from unusual paths
+DeviceImageLoadEvents 
+| where FileName has "mpclient"
+| where not (FolderPath has_any (
+  "\\Program Files\\Windows Defender\\",
+  "\\ProgramData\\Microsoft\\Windows Defender\\"
+))
+| distinct DeviceName, InitiatingProcessFileName,FileName, FolderPath
