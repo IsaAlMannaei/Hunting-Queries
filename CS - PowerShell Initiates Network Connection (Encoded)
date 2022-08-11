@@ -1,0 +1,8 @@
+// Detects when a powershell process is initiating a network connection with the encoded argument is set. 
+// Author: Isa AlMannaei
+
+event_simpleName="NetworkConnectIP4" NOT (RemoteAddressIP4=172.16.0.0/12 OR RemoteAddressIP4=192.168.0.0/16 OR RemoteAddressIP4=10.0.0.0/8) 
+| rename ContextProcessId_decimal as TargetProcessId_decimal | join TargetProcessId_decimal [search event_simpleName="ProcessRollup2" AND ImageFileName="*powershell.exe" AND CommandLine!="-ExecutionPolicy" 
+    | where match(CommandLine,"(?i)[\-|\/|||]e(nc*o*d*e*d*c*o*m*m*a*n*d*)*\s+[^-]") ] 
+| convert ctime(_time)
+| table ComputerName _time ImageFileName  RemoteAddressIP4 CommandLine
