@@ -1,6 +1,7 @@
 // CrowdStrike query to look for mpclient.dll loaded by a process from unusual locations
+// Author: Isa AlMAnnaei
 
-event_simpleName=ImageHash mpclient.dll
+event_simpleName=ImageHash mpclient.dll 
 | rename FilePath as DllFilePath
 | rename FileName as DllFileName
 | rename ContextProcessId_decimal as TargetProcessId_decimal | join TargetProcessId_decimal
