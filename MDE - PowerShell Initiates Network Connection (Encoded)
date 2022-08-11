@@ -1,0 +1,18 @@
+// Detects when a powershell process is initiating a network connection with the encoded argument is set. 
+// Author: Isa AlMannaei
+
+DeviceNetworkEvents 
+| where ActionType contains "ConnectionSuccess"
+| where InitiatingProcessFileName contains "powershell.exe"
+| where not (RemoteIP has_any ("192.168" , "172." , "10."))
+| where InitiatingProcessCommandLine contains "-e"
+| extend EncodedCommand = extract(@'\s+([A-Za-z0-9+/]{20}\S+$)', 1, InitiatingProcessCommandLine)
+| where EncodedCommand != ""
+| extend DecodedCommand = base64_decode_tostring(EncodedCommand)
+| where DecodedCommand != ""
+| project
+    DeviceName,
+    InitiatingProcessAccountName,
+    InitiatingProcessCommandLine,
+    EncodedCommand,
+    DecodedCommand
